@@ -1,0 +1,79 @@
+`timescale 1ns / 1ps
+
+module sseg_x4_top(input clk, btnC, input [15:0] sw, output [6:0] seg, output [3:0] an, output dp, output [4:0] JA);
+    wire clkd;
+    
+    wire [3:0] hex_num; // seg and dp are already declared as ports    
+    sseg_display U0(
+    .seg   (seg),           //  drives the seven LEDs for the display
+    .dp    (dp),            //  decimal place assigned permanently to 1'b1
+    .sw    (hex_num)        //  can't be called sw any more so I'll call it hex_num
+    );
+                
+    clk_gen U1(clk, btnC, clkd);
+    digit_selector U2(clkd, btnC, an);
+    hex_num_gen U3(an, sw, hex_num);
+
+    assign JA = {clkd, an};
+endmodule
+
+module sseg_display(input [3:0] sw, output dp, output [3:0] an, output reg [6:0] seg );
+assign an = 4'b1110; assign dp = 1'b1;                   
+initial begin seg = 7'b1000000; end
+
+always @(sw)  begin
+    if      (sw == 4'b0000) seg = 7'b1000000; // 0
+    else if (sw == 4'b0001) seg = 7'b1111001; // 1
+    else if (sw == 4'b0010) seg = 7'b0100100; // 2
+    else if (sw == 4'b0011) seg = 7'b0110000; // 3
+    else if (sw == 4'b0100) seg = 7'b0011001; // 4
+    else if (sw == 4'b0101) seg = 7'b0010010; // 5
+    else if (sw == 4'b0110) seg = 7'b0000010; // 6
+    else if (sw == 4'b0111) seg = 7'b1111000; // 7
+    else if (sw == 4'b1000) seg = 7'b0000000; // 8 
+    else if (sw == 4'b1001) seg = 7'b0010000; // 9
+    else if (sw == 4'b1010) seg = 7'b0001000; // A
+    else if (sw == 4'b1011) seg = 7'b0000011; // B
+    else if (sw == 4'b1100) seg = 7'b1000110; // C
+    else if (sw == 4'b1101) seg = 7'b0100001; // D
+    else if (sw == 4'b1110) seg = 7'b0000110; // E
+    else if (sw == 4'b1111) seg = 7'b0001110; // F
+    else seg = 7'bXXXXXXX;  //don't care for simulation
+end //always
+
+endmodule
+
+module hex_num_gen(input [3:0] digit_sel, input [15:0] sw, output reg [3:0] hex_num);
+
+always@ * begin
+    if      (digit_sel == 4'b1110) hex_num = sw[3:0];
+    else if (digit_sel == 4'b1101) hex_num = sw[7:4];
+    else if (digit_sel == 4'b1011) hex_num = sw[11:8];
+    else if (digit_sel == 4'b0111) hex_num = sw[15:12];
+    else hex_num = 4'bxxxx; end
+endmodule
+
+module digit_selector(input clk, rst, output reg [3:0] digit_sel);
+    initial begin digit_sel <= 4'b1110; end
+    
+    always@(posedge clk, posedge rst) begin
+            if (rst) digit_sel <= 4'b1110;
+            else if (!rst) begin 
+            digit_sel[3:1] <= digit_sel[2:0]; digit_sel[0]   <= digit_sel[3]; end 
+            else digit_sel <= 4'bXXXX; end    
+    
+endmodule
+
+module clk_gen(input clk, rst, output clk_div);
+    reg [26:0] counter;
+    assign clk_div = counter[18]; //use bit 2 for sim then 18 for implementation
+    
+    initial begin counter <= 27'b000000000000000000000000000; end
+    
+    always @ (posedge clk, posedge rst)
+    begin
+        if (rst)      counter <= 27'b000000000000000000000000000;
+        else if(!rst) counter <= counter + 1'b1;
+        else          counter <= 27'bxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+    end
+endmodule

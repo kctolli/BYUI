@@ -1,0 +1,421 @@
+`timescale 1ns / 1ps //AVR commands are similar to functions function ideas; Part # ATmega48A
+
+module interface(input clk, btnU, btnD, btnR, btnL, btnC, input [15:0] sw, input [3:0] JB, JC, output [7:0] JA, output [6:0] seg, output [3:0] an, output dp);
+    wire [15:0] out; reg [15:0] in; initial begin in = 16'h0000; end //Setup 
+    
+    //Debounce Buttons and Display
+    wire function_sel, sel0, sel1, sel2, rst; 
+    buttons U0(clk, btnR, btnL, btnD, btnC, function_sel, sel0, sel1, sel2);
+    btn_debounce U1(clk, btnU, rst);        //Setup reset 
+    Register_store U2(clk, rst, in, out);   //Store the values
+    sseg_x4_top U3(clk, rst, out, seg, an, dp); 
+    
+    //Assigning JA Ports
+    assign JA[3:0] = an;
+    assign JA[4] = rst;
+    assign JA[5] = function_sel; 
+    clk_gen C0(clk, rst, JA[6]);
+    gen_clk C1(clk, rst, JA[7]);
+    
+    //Modules for calculator
+    wire [15:0] fun, op, seq, reggy, relation, logic, mult, add_sub;
+    function_interface F(clk, sw, fun);
+    op_interface O(clk, function_sel, sw, op);
+    relational_interface R(function_sel, sw, relation);
+    logic_interface L(sw, logic);
+    multiply M(clk, sw[7:0], sw[15:8], mult);
+    adder A(function_sel, sw, add_sub);     
+    
+    //Choose what function to preform
+    always @(*) begin
+        if(rst)          in = 16'h0000;
+        else if(sel0)    in = 16'hFFFF;
+        else if(JB[0])   in = fun;
+        else if(JB[1])   in = op; 
+        else if(JB[2])   in = relation;
+        else if(JC[0])   in = logic;
+        else if(JC[1])   in = mult;
+        else if(JC[2])   in = add_sub; end
+    
+    always @(posedge clk) in <= in;
+        
+endmodule
+
+module clk_gen(input clk, rst, output dclk); //for 7seg
+    reg [26:0] counter; initial counter <= 27'b000000000000000000000000000;
+    assign dclk = counter[18]; 
+    always @ (posedge clk, posedge rst) begin 
+    if (rst) counter <= 27'b000000000000000000000000000; 
+    else counter <= counter + 1'b1; end 
+endmodule
+
+module gen_clk(input clk, rst, output dclk); //for counters
+    reg [26:0] counter; initial counter <= 27'b000000000000000000000000000;
+    assign dclk = counter[26]; 
+    always @ (posedge clk, posedge rst) begin 
+    if (rst) counter <= 27'b000000000000000000000000000; 
+    else counter <= counter + 1'b1; end 
+endmodule
+
+module buttons(input clk, btn0, btn1, btn2, btn3, output out0, out1, out2, out3);
+    btn_debounce B0(clk, btn0, out0); btn_debounce B1(clk, btn1, out1);
+    btn_debounce B2(clk, btn2, out2); btn_debounce B3(clk, btn3, out3);
+endmodule
+
+module btn_debounce(input clk, btn_in, output btn_status);
+    reg [19:0] btn_shift; reg [15:0] cnt; wire clkb; 
+    assign btn_status = &btn_shift; assign clkb = cnt[15];
+    initial cnt = 0; always @ (posedge clk) cnt <= cnt + 1;
+    always @ (posedge clkb) btn_shift <= {btn_shift[18:0], btn_in};
+endmodule
+
+module sseg_x4_top(input clk, rst, input [15:0] sw, output [6:0] seg, output [3:0] an, output dp);
+    wire [3:0] hex_num; wire dclk;   
+    sseg_display U0(.seg(seg), .dp (dp), .sw(hex_num));      
+    clk_gen U1(clk, rst, dclk);             
+    digit_selector U2(dclk, rst, an);
+    hex_num_gen U3(an, sw, hex_num);
+endmodule
+
+module sseg_display(input [3:0] sw, output dp, output [3:0] an, output reg [6:0] seg );
+    assign an = 4'b1110; assign dp = 1'b1; initial seg = 7'b1000000;
+    
+    always @(sw)  begin
+        if      (sw == 4'b0000) seg = 7'b1000000; // 0
+        else if (sw == 4'b0001) seg = 7'b1111001; // 1
+        else if (sw == 4'b0010) seg = 7'b0100100; // 2
+        else if (sw == 4'b0011) seg = 7'b0110000; // 3
+        else if (sw == 4'b0100) seg = 7'b0011001; // 4
+        else if (sw == 4'b0101) seg = 7'b0010010; // 5
+        else if (sw == 4'b0110) seg = 7'b0000010; // 6
+        else if (sw == 4'b0111) seg = 7'b1111000; // 7
+        else if (sw == 4'b1000) seg = 7'b0000000; // 8 
+        else if (sw == 4'b1001) seg = 7'b0010000; // 9
+        else if (sw == 4'b1010) seg = 7'b0001000; // A
+        else if (sw == 4'b1011) seg = 7'b0000011; // B
+        else if (sw == 4'b1100) seg = 7'b1000110; // C
+        else if (sw == 4'b1101) seg = 7'b0100001; // D
+        else if (sw == 4'b1110) seg = 7'b0000110; // E
+        else if (sw == 4'b1111) seg = 7'b0001110; // F
+        else seg = 7'bXXXXXXX; end  //don't care for simulation
+endmodule
+
+module digit_selector(input clk, rst, output reg [3:0] digit_sel);
+    initial begin digit_sel <= 4'b1110; end
+    
+    always@(posedge clk, posedge rst) begin
+            if (rst) digit_sel <= 4'b1110;
+            else begin 
+            digit_sel[3:1] <= digit_sel[2:0];
+            digit_sel[0]   <= digit_sel[3]; end end    
+endmodule
+
+module hex_num_gen(input [3:0] digit_sel, input [15:0] sw, output reg [3:0] hex_num);
+    always@ * begin
+        if      (digit_sel == 4'b1110) hex_num = sw[3:0];
+        else if (digit_sel == 4'b1101) hex_num = sw[7:4];
+        else if (digit_sel == 4'b1011) hex_num = sw[11:8];
+        else if (digit_sel == 4'b0111) hex_num = sw[15:12];
+        else hex_num = 4'bxxxx; end
+endmodule    
+
+module Register_store(input clk, rst, input [15:0] Datain, output reg [15:0] Dataout);  
+    wire [3:0] Write; assign Write = 4'h8; wire[15:0] out;
+    Register_4bit R0(clk, rst, Write[2:0], Write, Datain [3:0], out [3:0]);
+    Register_4bit R1(clk, rst, Write[2:0], Write, Datain [7:4], out [7:4]);
+    Register_4bit R2(clk, rst, Write[2:0], Write, Datain [11:8], out [11:8]);
+    Register_4bit R3(clk, rst, Write[2:0], Write, Datain [15:12], out [15:12]);
+    
+    always @(posedge clk) Dataout <= out;
+endmodule
+
+module Register_4bit(input clk, rst, input [2:0] Readadd, input [3:0] Write, Datain, output [3:0] Dataout);  
+    wire [2:0] Writeadd; assign Writeadd = Write[2:0]; 
+    wire WE; assign WE = Write[3];
+    reg  [3:0] regFile [7:0]; //4 bit Register
+    
+    initial begin //Initialize all Register Files
+        regFile[0] = 4'h0; regFile[1] = 4'h0;
+        regFile[2] = 4'h0; regFile[3] = 4'h0;
+        regFile[4] = 4'h0; regFile[5] = 4'h0;
+        regFile[6] = 4'h0; regFile[7] = 4'h0;  end
+        
+    assign Dataout = regFile[Readadd]; //  MUX 
+        
+    always @(posedge clk) begin 
+        if (WE) regFile[Writeadd] <= Datain; //  Decoder 
+        else if (rst) begin //  Reset
+            regFile[0] = 4'h0; regFile[1] = 4'h0;
+            regFile[2] = 4'h0; regFile[3] = 4'h0;
+            regFile[4] = 4'h0; regFile[5] = 4'h0;
+            regFile[6] = 4'h0; regFile[7] = 4'h0; end end    
+endmodule
+
+module adder(input z, input [15:0] sw, output [15:0] out); 
+    assign out = z ? (sw[15:8] - sw[7:0]) : (sw[15:8] + sw[7:0]); endmodule
+
+module function_interface(input clk, input [15:0] sw, output reg [15:0] out);
+    wire [15:0] comp_2s, neg, inc, times, square;
+    twos_comp T(sw[7:0], comp_2s);  
+    negate N(sw[7:0], neg);
+    increment_decrement I(sw[7:0], inc);
+    times2 X(sw[7:0], times);
+    square_8 S(clk, sw, square); 
+    
+    always @(*) begin 
+        if(sw[8])       out = comp_2s;      
+        else if(sw[9])  out = neg; 
+        else if(sw[10]) out = inc;
+        else if(sw[11]) out = times; 
+        else            out = square; end
+endmodule
+
+module square_8(input clk, input [7:0] a, output [15:0] m);
+    multiply(clk, a, a, m); endmodule
+
+module multiply(input clk, input wire [7:0] a, b, output reg [15:0] m);
+    wire [15:0] p0, p1, p2, p3, p4, p5, p6, p7;
+    reg [15:0] s0, s1, s2, s3, s4, s5;
+    
+    //ands  A to B and shifts it a certian amount
+    assign p0 = {({8{a[0]}} & b[7:0])}; 
+    assign p1 = {({8{a[1]}} & b[7:0]), 1'h00}; 
+    assign p2 = {({8{a[2]}} & b[7:0]), 2'h00};
+    assign p3 = {({8{a[3]}} & b[7:0]), 3'h00};
+    assign p4 = {({8{a[4]}} & b[7:0]), 4'h00};
+    assign p5 = {({8{a[5]}} & b[7:0]), 5'h00};
+    assign p6 = {({8{a[6]}} & b[7:0]), 6'h00}; 
+    assign p7 = {({8{a[7]}} & b[7:0]), 7'h00};
+    
+    //adds up all the shifted and anded results
+    always @(posedge clk) begin
+        s0 <= p0 + p1; s1 <= p2 + p3;
+        s2 <= p4 + p5; s3 <= p6 + p7; 
+        s4 <= s0 + s1; s5 <= s2 + s3;
+        m  <= s4 + s5; end
+endmodule
+
+module twos_comp(input [7:0] x, output reg [15:0] S);
+    reg a,b; 
+    always @(*) begin 
+        a <= ~x; S[7:0] <= a + 1'b1; end 
+    always @(*) begin 
+        b <= x ^ 16'hffff; S[15:8] <= b + 1'b1; end
+endmodule
+
+module negate(input [7:0] X, output [15:0] S);
+    assign S = -X; endmodule
+
+module times2(input [7:0] X, output [15:0] S);
+    assign S = X + X; endmodule                
+
+module increment_decrement(input [7:0] X, output [15:0] out);
+    assign out[7:0] = X + 1'b1; assign out[15:8] = X - 1'b1; endmodule  
+    
+module relational_interface(input z, input[15:0] x, output reg [15:0] out);
+    wire [15:0] comp, xr, ad, nr, right1, left1, righta, lefta, com;
+    compare C(x[3:0], x[7:4], comp);
+    xor_xnor_reduct X(x[7:0], xr);
+    and_nand_reduct A(x[7:0], ad);
+    or_nor_reduct O(x[7:0], nr);
+    right_by_1 R(x[7:0], right1);
+    left_by_1 L(x[7:0], left1);
+    right_arithmetic_1 M(x[7:0], righta);
+    left_arithmetic_1 E(x[7:0], lefta);
+    comparator P(x[3:0], x[7:4], z, com);
+        
+    always @(*) begin
+    if (x[8])       out = comp;
+    else if (x[9])  out = xr;
+    else if (x[10]) out = ad;
+    else if (x[11]) out = nr;
+    else if (x[12]) out = right1;
+    else if (x[13]) out = left1;
+    else if (x[14]) out = righta;
+    else if (x[15]) out = lefta;
+    else            out = com; end
+endmodule
+
+module right_by_1(input [7:0] x, output [15:0] b);
+    assign b = x >> 1; endmodule
+    
+module left_by_1(input [7:0] x, output [15:0] b);
+    assign b = x << 1; endmodule
+    
+module right_arithmetic_1(input [7:0] x, output [15:0] b);
+    assign b = x >>> 1; endmodule
+    
+module left_arithmetic_1(input [7:0] x, output [15:0] b);
+    assign b = x <<< 1; endmodule
+
+module and_nand_reduct(input [7:0] x, output [15:0] b);
+    assign b[7:0] = &x; assign b[15:8] = ~&x; endmodule
+
+module or_nor_reduct(input [7:0] x, output [15:0] b);
+    assign b[7:0] = |x; assign b[15:8] = ~|x; endmodule
+    
+module xor_xnor_reduct(input [7:0] x, output [15:0] b);
+    assign b[7:0] = ^x; assign b[15:8] = ~^x; endmodule
+
+module comparator(input [3:0] x, y, input z, output [15:0] b);
+    assign b[0] = (x > y);  
+    assign b[1] = (x >= y);
+    assign b[2] = (x < y);  
+    assign b[3] = (x <= y);
+    assign b[4] = (x == y); 
+    assign b[5] = (x != y);
+    assign b[6] = (x == 16'h0000);
+    assign b[7] = (x == 16'hFFFF);
+    assign b[15:8] = z ? x : y;
+endmodule 
+    
+module compare(input [3:0] x, y, output reg [11:0] out);
+    initial out = 16'h0000;
+    always @(*) begin
+        if(x > y) begin out[7:0] = x; out[10] = 1'b1; end
+        else if(x < y) begin out[7:0] = y; out[11] = 1'b1; end
+        else begin out[7:0] = x | y; out[11:10] = 2'b11; end end
+endmodule
+
+module logic_interface(input [15:0] x, output reg [15:0] out);
+    wire [15:0] ad, nd, ro, nr, xr, xnr, i, on, an;
+    ander A(x[3:0], x[7:4], ad);
+    nander N(x[3:0], x[7:4], nd);
+    orer O(x[3:0], x[7:4], ro);
+    norer R(x[3:0], x[7:4], nr);
+    xorer X(x[3:0], x[7:4], xr);
+    xnorer XN(x[3:0], x[7:4], xnr); 
+    inversion I(x[7:0], i);
+    or_not ON(x[3:0], x[7:4], on);
+    and_not AN(x[3:0], x[7:4], an);
+    
+    always @(*) begin
+    if(x[8])       out = ad;     
+    else if(x[9])  out = nd;
+    else if(x[10]) out = ro;   
+    else if(x[11]) out = nr;
+    else if(x[12]) out = xr;     
+    else if(x[13]) out = xnr;
+    else if(x[14]) out = i;   
+    else if(x[15]) out = on;
+    else           out = an; end
+endmodule
+
+module ander(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = x & y; assign b[15:8] = x && y; endmodule
+    
+module nander(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = ~(x & y); assign b[15:8] = !(x && y); endmodule
+    
+module orer(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = x | y; assign b[15:8] = x || y; endmodule
+    
+module norer(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = ~(x | y); assign b[15:8] = !(x || y); endmodule
+
+module xorer(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = x ^ y; assign b[15:8] = x ^^ y; endmodule
+
+module xnorer(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = ~(x ^ y); assign b[15:8] = !(x ^^ y); endmodule
+    
+module and_not(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = ~x & ~y; assign b[15:8] = !x && !y; endmodule
+    
+module or_not(input [3:0] x, y, output [15:0] b);
+    assign b[7:0] = ~x | ~y; assign b[15:8] = !x || !y; endmodule
+    
+module inversion(input [7:0] x, output [15:0] b);
+    assign b[7:0] = ~x; assign b[15:8] = !x; endmodule 
+    
+module op_interface(input clk, rst, input [15:0] sw, output reg [15:0] out);
+    wire [15:0] opn, nnop, buff, bit, ops;
+    nop n(opn);
+    not_nop t(nnop);
+    op o(sw, ops);
+    buffer b(clk, rst, sw, buff);
+    bitflip f(sw, bit);
+    
+    wire [15:0] up, ring, tog, latch, gray, mega; wire dclk;
+    updowncnt U(dclk, rst, sw[0], up);
+    ringcnt R(dclk, rst, ring);
+    graycnt G(dclk, rst, gray);
+    mega_shift M(dclk, rst, mega);
+    gen_clk C(clk, rst, dclk);
+    
+
+    always @(*) begin
+        if(sw[8])       out = opn;     
+        else if(sw[9])  out = nnop;
+        else if(sw[10]) out = ops;   
+        else if(sw[11]) out = buff;
+        else if(sw[12]) out = bit;
+        else if(sw[13]) out = gray;
+        else if(sw[14]) out = ring;
+        else if(sw[15]) out = mega;
+        else            out = up; end
+        
+    always @(posedge clk) out <= out;
+endmodule
+
+module nop(output [15:0] b);
+    assign b = 16'h0000; endmodule
+    
+module not_nop(output [15:0] b);
+    assign b = 16'hFFFF; endmodule
+    
+module op(input [7:0] x, output [15:0] b);
+    assign b = x; endmodule    
+    
+module buffer(input clk, rst, input [7:0] x, output reg [15:0] b);
+    reg a; initial b = 16'h0000;
+    always @ (posedge clk, posedge rst) begin 
+    if (rst) b <= 16'h0000;
+    else a <= ~x; b <= ~a; end
+    endmodule 
+    
+module bitflip(input [7:0] x, output [15:0] b);
+    assign b = x ^ 16'hffff; endmodule
+    
+module updowncnt(input clk, clr, cntDwn, output reg [15:0] upDown);
+        always @(posedge clk, posedge clr) begin
+        if (clr) upDown <= 16'h0000;  
+        else if (cntDwn) upDown <= upDown - 1;
+        else upDown <= upDown + 1; end    
+     endmodule
+    
+module graycnt(input clk, rst, output reg [15:0] gray);
+   reg [15:0] gray_next; 
+   always @(posedge clk, posedge rst) begin
+   if(rst) gray <= 16'h0111;
+   else begin 
+        gray[0]  <= gray_next[0];  gray[1]  <= gray_next[1]; 
+        gray[2]  <= gray_next[2];  gray[3]  <= gray_next[3]; 
+        gray[4]  <= gray_next[4];  gray[5]  <= gray_next[5];
+        gray[6]  <= gray_next[6];  gray[7]  <= gray_next[7]; 
+        gray[8]  <= gray_next[8];  gray[9]  <= gray_next[9]; 
+        gray[10] <= gray_next[10]; gray[11] <= gray_next[11];
+        gray[12] <= gray_next[12]; gray[13] <= gray_next[13]; 
+        gray[14] <= gray_next[14]; gray[15] <= gray_next[15]; end end
+   
+   always@(gray) begin case (gray)
+        16'h0000: gray_next <= 16'h1000; 16'h0001: gray_next <= 16'h0000; 
+        16'h0010: gray_next <= 16'h0011; 16'h0011: gray_next <= 16'h1011; 
+        16'h0100: gray_next <= 16'h0101; 16'h0101: gray_next <= 16'h0111; 
+        16'h0110: gray_next <= 16'h0010; 16'b0111: gray_next <= 16'h0110; 
+        16'h1000: gray_next <= 16'h1010; 16'h1001: gray_next <= 16'h0001; 
+        16'h1010: gray_next <= 16'h1110; 16'h1011: gray_next <= 16'h1001; 
+        16'h1100: gray_next <= 16'h0100; 16'h1101: gray_next <= 16'h1100; 
+        16'h1110: gray_next <= 16'h1111; 16'b1111: gray_next <= 16'h1101; endcase end 
+endmodule
+
+module ringcnt(input clk, clr, output reg [15:0] ring);
+    always @(posedge clk, posedge clr ) begin 
+    ring <= (clr? 16'h0001: {ring[14:0], ring[15]}); end 
+endmodule
+
+module mega_shift(input clk, rst, output reg [15:0] b);
+    always @(posedge clk, posedge rst) begin
+        if (rst) b <= 16'h0001;
+        else     b <= {b[11:0], b[15:12]}; end   
+endmodule

@@ -1,0 +1,87 @@
+---
+title: "Rent"
+date: "Week 1"
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r load, include=FALSE}
+library(mosaic)
+library(pander)
+library(tidyverse)
+library(DT) 
+library(knitr)
+Rent <- read_csv("https://github.com/kctolli/MATH325/raw/master/Data/Rent.csv") %>% na.omit() %>% 
+  mutate(MilesToCampus = as.numeric(round(MilesToCampus, digits = 3))) %>% 
+  mutate(Price = as.numeric(round(Price, digits = 0)))
+```
+
+<br />
+
+## Background
+
+Here is a data table showing the available approved housing apartment options at BYU-Idaho for single students. There are 122 entries comprising 57 female and 65 male apartment options.
+
+```{r base, warning=FALSE}
+# Code to get you started. 
+# View(...) works great in the Console, but datatable(...) must be
+# used instead within an R-chunk.
+datatable(Rent, options=list(lengthMenu = c(3,10,30)), 
+          extensions="Responsive",
+          caption = 'Table 1: Base dataset')
+```
+
+Does location (distance from campus) effect Rent price per semester? 
+
+## Graphic
+
+<!-- Present an interesting graphic using the Rent data set. Do not create the same graphics that are shown in the [Good Example Analysis](./Analyses/StudentHousing.html), but you can certainly use those graphics as a guide to inspire you on what to do yourself. -->
+
+The plot below shows the distribution of distance to campus and cost per semester. 
+
+```{r graphical, warning=FALSE}
+# Use this R-chunk to...
+# ...Create an interesting graphic using the Rent data set.
+
+ggplot(data = Rent, aes(x = MilesToCampus, y = Price)) +
+  geom_point() +
+  facet_wrap(~Gender) + 
+  theme_bw() +
+  labs(x = "Distance to Campus (miles)", y = "Entry-level Cost for Single Housing per Semester")
+```
+
+
+<!-- Write a few statements here that explain your graphic and what it shows. -->
+
+The plot doesn't show a comparison of distance to cost. I find that interesting because Lord Harold Samuel said "Location, Location, Location." This means that location is the most important. It would make since to have the closer to campus you are the more expensive but the data doesn't prove that point. 
+
+```{r wrangle, warning=FALSE}
+# Use this R-chunk to ...
+# ...Wrangle, manipulate, and clean the data set.
+dat1 <- Rent %>% 
+  group_by(MilesToCampus, Gender) %>% 
+  summarise(meanprice = as.numeric(round(mean(Price), digits = 0)), 
+            medianprice = as.numeric(round(median(Price), digits = 0)),  
+            maxprice = as.numeric(round(max(Price), digits = 0)),  
+            minprice = as.numeric(round(min(Price), digits = 0)),  
+            .groups = 'drop') 
+```
+
+```{r numerical, warning=FALSE}
+# Use this R-chunk to...
+# ...compute and display a meaningful table of numerical summaries supporting your above graphic.
+
+datatable(dat1, options=list(lengthMenu = c(3,10,30)), 
+          caption = "Table 2: Distance, Gender and Price Comparisons")
+```
+
+<!-- Write a few statements here that introduce your table of numerical summaries and what they show. -->
+
+This table shows the numerical analyses of prices grouped by distance and gender. The table allows us to view the data of mean, median, max and min price which helps with understanding introduced in the graph above. 
+
+
+## Conclusion
+
+There are some interesting conclusions we can learn from the data. One is female housing is more expensive and also closer to campus than male housing. Also most student housing is closer than .5 miles to campus. A great English language adage is, "A picture is worth a thousand words" meaning that complex and sometimes multiple ideas can be conveyed by a single still image, which conveys its meaning or essence more effectively than a mere verbal description. I believe this applies to data visualizations so there are many other insists learned from this analysis.  

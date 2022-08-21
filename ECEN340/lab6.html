@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Lab 6</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <!-- import the webpage's javascript file -->
+    <script src="/script.js" defer></script>
+  </head>  
+  <body>
+    <header>
+        <nav>
+            <ul>
+                <h1>ECEN 340 Lab 6 </h1> 
+                <h2>Timing Evaluation and Improvement</h2>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="labs.html">Labs</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h3>Overview</h3>     
+    <p>The objective of this lab is to evaluate the timing of Lab 5’s memory design to determine it’s maximum operating frequency for:
+    <ol type="A">
+    <li>An 8-bit adder using the “+” operator</li>
+    <li>An 8-bit multiplier using the “*” operator</li>
+    <li>An 8-bit multiplier using the instantiation of Lab 2, the continuous assignment (data-flow) multiplier.</li>
+    </ol>
+</p>
+
+<p>In other words, for part B, you will replace the “+” operator in lab 5 with an instantiation of your Lab 2 multiplier in order to evaluate its maximum speed.  For part C, you must write a new and improved multiplier module.
+
+The final objective of this lab is to speed up the clock rate of the multiplier by pipelining the design.  
+
+Increased slack by 10x the original value. So the speed of running was 10x less. Pipelining was a way to optimize code and hardware.    
+</p>
+    
+    <!--<p>
+      Here's the Lab Report. <a href="https://drive.google.com/open?id=1x8WMxlyhtyno2ZhoQgXbKfI0ivfpdMNOda2CQiyhq5U">Lab 6 Report</a>
+    </p>-->
+    
+    <p>
+      Here's the Lab Code. <a href="mem_top.txt">Memory Code (Lab 5)</a> &nbsp <a href="pipelined.txt">Pipelined (Multiplier Lab2)</a>
+    </p>
+  
+      <p>
+      Here's the Lab Test Bench. <a href="pipelined_tb.txt">Lab 6 TB</a>
+    </p>  
+  
+     <footer>
+        <div class = "leftcol">  <p>&copy; 2019 - Kyle Tolliver | ECEN 340 - Digital System Design</p></div>
+        <div class = "rightcol"> <p>Lab 6</p></div>
+    </footer> 
+     
+  </body>
+</html>

@@ -1,0 +1,67 @@
+`timescale 1ns / 1ps
+
+module Interface(input btnR, btnL, input [15:0] sw, output [15:0] led);
+    wire [15:0] a, b, c; 
+    multiply_8(sw [7:0], sw [15:8], a);
+    add_8(sw [7:0], sw [15:8], b[7:0], b[8]);
+    sub_8(sw [7:0], sw [15:8], c[7:0]);
+    assign b[15:9] = 7'b0000000, c[15:8] = 8'b00000000;
+    
+    assign led = btnR ? btnL ? c : b : a; 
+endmodule
+
+module multiply_8(input [7:0] a, b, output [15:0] m);
+    wire [15:0] p0, p1, p2, p3, p4, p5, p6, p7;
+    
+    // ands  A to B and shifts it a certian amount
+    assign p0 = {({8{a[0]}} & b[7:0])}; 
+    assign p1 = {({8{a[1]}} & b[7:0]), 1'h00}; 
+    assign p2 = {({8{a[2]}} & b[7:0]), 2'h00};
+    assign p3 = {({8{a[3]}} & b[7:0]), 3'h00};
+    assign p4 = {({8{a[4]}} & b[7:0]), 4'h00};
+    assign p5 = {({8{a[5]}} & b[7:0]), 5'h00};
+    assign p6 = {({8{a[6]}} & b[7:0]), 6'h00}; 
+    assign p7 = {({8{a[7]}} & b[7:0]), 7'h00};
+    
+    //adds up all the shifted and anded results
+    assign m = p0 + p1 + p2 + p3 + p4 + p5 + p6 + p7; 
+endmodule
+
+module add_8(input [7:0] X, Y, output [7:0] S, output Z);
+    //assign S = X + Y;// for testing
+    wire [6:0] C; // carry around
+    
+    adder_full add0(1'b0, X[0], Y[0], C[0], S[0]); 
+    adder_full add1(C[0], X[1], Y[1], C[1], S[1]); 
+    adder_full add2(C[1], X[2], Y[2], C[2], S[2]); 
+    adder_full add3(C[2], X[3], Y[3], C[3], S[3]); 
+    adder_full add4(C[3], X[4], Y[4], C[4], S[4]); 
+    adder_full add5(C[4], X[5], Y[5], C[5], S[5]); 
+    adder_full add6(C[5], X[6], Y[6], C[6], S[6]); 
+    adder_full add7(C[6], X[7], Y[7],    Z, S[7]); 
+endmodule
+
+module sub_8(input [7:0] X, Y, output [7:0] S);
+    //assign S = X-Y; // for testing
+    wire [6:0] C; // carry around
+    
+    sub_full sub0(1'b1, X[0], Y[0], C[0], S[0]); 
+    sub_full sub1(C[0], X[1], Y[1], C[1], S[1]); 
+    sub_full sub2(C[1], X[2], Y[2], C[2], S[2]); 
+    sub_full sub3(C[2], X[3], Y[3], C[3], S[3]); 
+    sub_full sub4(C[3], X[4], Y[4], C[4], S[4]); 
+    sub_full sub5(C[4], X[5], Y[5], C[5], S[5]); 
+    sub_full sub6(C[5], X[6], Y[6], C[6], S[6]); 
+    sub_full sub7(C[6], X[7], Y[7], 0'b0, S[7]); 
+endmodule
+
+module sub_full(input Cin, x, y, output Cout, s);
+    //full subtracter in Dataflow
+    wire z; assign z = (~y); //Convert y into a 1's complement number 
+    adder_full(Cin, x, z, Cout, s);
+endmodule
+
+module adder_full(input Cin, x, y, output Cout,s);    
+    //full adder in Dataflow
+    assign s = (x ^ y) ^ Cin, Cout = (x & y) | (x & Cin) | (y & Cin);
+endmodule            

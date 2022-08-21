@@ -1,0 +1,139 @@
+---
+title: "Chocolate"
+subtitle: "Kruskal-Wallis Test"
+date: "Week 6"
+---
+
+```{r, include=FALSE}
+# Be sure to use your file menus at the top of R-Studio to:
+# "Session -> Set working directory -> To source file location"
+# Then play this chunk and the next one to get the data into R.
+library(mosaic)
+library(car)
+library(DT)
+library(pander)
+library(tidyverse)
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+choc <- read_csv("https://github.com/kctolli/MATH325/raw/master/Data/Chocolate.csv") %>% 
+  na.omit() %>% mutate(Cocao = parse_number(as.character(Cocao)))
+
+
+choc$Cocoa <- cut(choc$Cocao, c(41,60,69,79,89,100), labels=c("Medium-Chocolate", "Dark", "Double-Dark", "Extra-Dark", "Super-Dark"),ordered_result = TRUE)
+```
+
+```{r, eval=FALSE}
+getwd()
+View(choc)
+```
+
+<!-- ---- -->
+
+<!-- Instructions:
+
+ Use the Chocolate dataset and a Kruskal-Wallis Test(s) to answer an interesting question(s) that you come up with.
+ 
+ About the dataset:
+ 
+  * Company: Name of the company manufacturing the bar.
+
+  * Orig: The specific geo-region of origin for the bar.
+
+  * Review: Date of publication of the review.
+
+  * Cocoa: Cocoa percentage (darkness) of the chocolate bar being reviewed.
+
+  * Location: Manufacturer base country.
+
+  * Rating: Expert rating for the bar.
+      5= Elite (Transcending beyond the ordinary limits)
+      4= Premium (Superior flavor development, character and style)
+      3= Satisfactory(3.0) to praiseworthy(3.75) (well made with special qualities)
+      2= Disappointing (Passable but contains at least one significant flaw)
+      1= Unpleasant (mostly unpalatable)
+
+   * Type: The variety (breed) of cocoa bean used, if provided.
+   
+   * BroadOrig: The broad geo-region of origin for the bean.
+
+Note this dataset and description come from: © 2018 Kaggle Inc for further details visit:
+
+[Kaggle.com](https://www.kaggle.com/rtatman/chocolate-bar-ratings/data)
+
+-->
+
+## Background 
+
+There are many different Chocolate bars in the dataset. I will be comparing how percent cocoa and rating is compared.  
+
+In this data the each experimental unit is assigned to exactly one factor-level combination. Another way to say this is “one measurement per individual” (no repeated measures) and “equal numbers of individuals per group”.
+
+This test is done using Kruskal-Wallis and One-Way ANOVA. What percent Cocoa has the greatest rating? 
+
+$$
+  H_0: \mu_\text{Medium-Chocolate} = \mu_\text{Dark} = \mu_\text{Double-Dark} = \mu_\text{Extra-Dark} = \mu_\text{Super-Dark} = \mu 
+$$
+
+$$
+  H_a: \mu_\text{i} \neq \mu_\text{for at least one group}
+$$
+
+A significance level of $\alpha = 0.05$ will be used for this study.
+
+## Data Analysis {.tabset .tabset-fade}
+
+### Basic Statistics
+
+```{r}
+pander(favstats(Rating ~ Cocoa, data = choc)[,-10])
+```
+
+### Kruskal-Wallis Test
+
+```{r}
+mykruskal <- kruskal.test(Rating ~ Cocoa, data=choc)
+pander(mykruskal)
+```
+
+```{r}
+boxplot(Rating ~ Cocoa, data=choc, type=c("p","a"), col='grey', xlab="Percent of Cocoa", ylab="Rating of Chocolate", main="Rating vs Percent Cocoa")
+```
+
+### ANOVA Test
+
+```{r}
+myaov <- aov(Rating ~ Cocoa, data=choc)
+pander(myaov)
+```
+
+```{r message=FALSE, warning=FALSE}
+par(mfrow = c(1,2))
+plot(myaov, which=1:2)
+```
+
+### The Data
+
+```{r, out.width=300}
+pander(choc, split.tables = Inf)
+```
+
+## Interpretation
+
+In this analysis I compared the percent of cocoa to rating of chocolate. 
+
+Rating is on a 1 to 5 scale. 
+
+1. Unpleasant
+2. Disappointing
+3. Satisfactory
+4. Premium 
+5. Elite 
+
+Percent Cocoa is broken into 
+
+* Medium-Chocolate
+* Dark
+* Double-Dark
+* Extra-Dark
+* Super-Dark
+
+Over all the Double Dark is the highest rating. We learn from the Kruskal-Wallis that the P-value is 1.462e-18 with 4 degrees of freedom. The P-value is less than the confidence interval so we will reject the null hypothesis.  

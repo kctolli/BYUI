@@ -1,0 +1,18 @@
+`timescale 1ns / 1ps
+
+module multiply_8(input [7:0] a, b, output [15:0] m);
+    wire [15:0] p0, p1, p2, p3, p4, p5, p6, p7;
+    
+    // ands  A to B and shifts it a certian amount
+    assign p0 = {({8{a[0]}} & b[7:0])}; 
+    assign p1 = {({8{a[1]}} & b[7:0]), 1'h00}; 
+    assign p2 = {({8{a[2]}} & b[7:0]), 2'h00};
+    assign p3 = {({8{a[3]}} & b[7:0]), 3'h00};
+    assign p4 = {({8{a[4]}} & b[7:0]), 4'h00};
+    assign p5 = {({8{a[5]}} & b[7:0]), 5'h00};
+    assign p6 = {({8{a[6]}} & b[7:0]), 6'h00}; 
+    assign p7 = {({8{a[7]}} & b[7:0]), 7'h00};
+    
+    //adds up all the shifted and anded results
+    assign m = p0 + p1 + p2 + p3 + p4 + p5 + p6 + p7; 
+endmodule

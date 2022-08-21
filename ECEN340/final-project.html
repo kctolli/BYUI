@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Final Project</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style.css">
+  </head>  
+  <body>
+    <header>
+        <!--<img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2FforKYLE%5B12682%5D.jpg?v=1560482631385" width="600" height="300" alt="website logo">-->
+        <nav>
+            <ul> 
+                <h1>ECEN 340 Final Project</h1> 
+                <h2>Multifunction Calculator</h2>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h3>Project Description</h3>
+    <p> 
+    I wanted to understand how calculators work and the hardware in them. I gave myself the challenge of creating a 64 functions. The types of functions are Basic Math, Logic, Reduction, Bitwise, and more. The functions are similar to the AVR commands for Assembly code. I was able to study and learn from the AVR command sheets. I also can use a memory, seven segment display and Pmod switchs on the Basys 3 Board. I was able to save memory to the Registers and Flip-Flops on the Basys 3 Board. I really liked this project and all that I was able to learn.      </p>
+    
+    <h3>Materials</h3>
+    <ul>
+       <li>Computer with Vivado</li>
+       <li>Basys 3 FPGA Board</li>
+       <li>Micro usb cable</li>
+       <li>Pmod 4 switch expansion (2)</li>
+       <li>Oscilliscope</li>
+   </ul>
+    
+    <h3>Inputs and Outputs</h3>
+    <ul>
+       <li>24 bit input into function and selectors</li>
+       <li>16 bit output from function feed into seven seg display</li>
+       <li>Clock for certain functions and Display / Storage</li>
+       <li>Reset to set seven seg display to all 0s</li>
+       <li>Fill to set seven seg display to all Fs</li>
+       <li>Reset to clear the calculator</li>
+       <li>8 bits used for Oscilliscope Readings </li>
+   </ul>
+    
+    <h3>Technology List</h3>
+    <ul>
+       <li>Higher level Math Functions (Multiply type)</li>
+       <li>7-segment Display</li>
+       <li>External Sensors (off-board switches)</li>
+       <li>Oscilliscope Readings</li>
+   </ul>
+       
+    <h3>Function Selectors</h3> 
+    <p> <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2Fpmodswt-1.png?v=1560483379122" width="200" height="150">
+        This will allow the user to select what type of function will be performed. </p>
+        
+    <h3>Display</h3> 
+    <p> <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2Fimages.jpg?v=1562621952069" width="200" height="100">
+        This will only show the user the resulting value. </p>
+    
+    <h3>Circuit Power, Schematic and Implemented Design</h3>
+    <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2FCapture2.PNG?v=1563354590964" width="600" height="300"> <br>
+    <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2FCapture.PNG?v=1563354580532" width="400" height="400"> 
+    <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2FCapture1.PNG?v=1563354585118" width="300" height="400">
+    
+    <h3>Module Selections</h3>
+    <ul>
+      <li>rst - 16'h0000 </li> 
+      <li>sel0 - 16'hFFFF</li> 
+      <li>JB[0] - functional</li> 
+      <li>JB[1] - operational</li> 
+      <li>JB[2] - relational</li>
+      <li>JC[0] - logical</li>
+      <li>JC[1] - multiplication</li>
+      <li>JC[2] - add or sub(function_sel)</li>
+    </ul>
+    
+    <h3>Function Selections</h3>
+    <h4>Functional</h4>
+    <ul>
+      <li>sw[8] - comp_2s </li>      
+      <li>sw[9] - negate </li>
+      <li>sw[10] - inc_dec </li>
+      <li>sw[11] - times 2</li>
+      <li>default - square</li>
+    </ul>
+    
+    <h4>Relational</h4>
+    <ul>
+      <li>sw[8] - compare</li>      
+      <li>sw[9] - xor reduction</li>
+      <li>sw[10] - and reduction</li>
+      <li>sw[11] - or reduction</li>
+      <li>sw[12] - right shift 1 </li>      
+      <li>sw[13] - left shift 1 </li>
+      <li>sw[14] - right arithmetic 1 </li>
+      <li>sw[15] - left arithmetic 1 </li>
+      <li>default - comparator</li>
+    </ul>
+    
+    <h4>Logical</h4>
+    <ul>
+      <li>sw[8] - ander </li>      
+      <li>sw[9] - nander </li>
+      <li>sw[10] - orer </li>
+      <li>sw[11] - norer </li>
+      <li>sw[12] - xorer </li>      
+      <li>sw[13] - xnorer </li>
+      <li>sw[14] - inversion </li>
+      <li>sw[15] - or not </li>
+      <li>default - and not </li>
+    </ul>
+    
+    <h4>Operational/Sequental</h4>
+    <ul>
+      <li>sw[8] - nop </li>      
+      <li>sw[9] - not nop </li>
+      <li>sw[10] - operation </li>
+      <li>sw[11] - buffer </li>
+      <li>sw[12] - bitflip </li>      
+      <li>sw[13] - gray </li>
+      <li>sw[14] - ring </li>
+      <li>sw[15] - mega shift </li>
+      <li>default - up or down(sw[1]) </li>
+    </ul>
+    
+    <h3>Oscilliscope Readings</h3>
+    <ul>
+      <li>JA[3:0] - an[3:0]</li>
+      <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2F20190717_1136341.jpg?v=1563388514804" width="200" height="100">
+      <li>JA[4] - rst</li>
+      <li>JA[5] - function_sel</li>
+      <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2F20190717_1140571.jpg?v=1563388630487" width="200" height="100">
+      <li>JA[6] - 7seg clk speed</li>
+      <li>JA[7] - counter clk speed</li>
+      <img src="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2F20190717_114313%5B13242%5D1.jpg?v=1563388912654" width="200" height="100">
+    </ul>
+    
+    
+    <!--<ul id = "one"><h3>Example Functions</h3><h4>(Verilog Code and Results)</h4></ul>-->
+    
+    <h3>Peer Reviews</h3>
+    <h4>Peer 1: Chase Busacker </h4>
+    <h4>Peer 2: Jonathon Chacon</h4>
+    
+    <h3>Conclusions</h3>
+    <p>
+    In this project I was able to create multiple functions. I created the needed registers and flip-flops to store the correct value. I was also able to display the results from the functions on the 7-segment display. I got my multifunction calculator to also perform the functions at the times the switches determined. I was able to learn alot more about Digital Systems, FPGA and Verilog through the course of this project. 
+    </p>
+           
+    <p>Useful Links <a href="https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2FECEN%20340%20Final%20Lab%20Project.pdf?v=1561414599174">Final Project Instructions</a> &nbsp <a href = "https://cdn.glitch.com/54642e6f-9bb7-4845-bae7-dd2ccd651200%2Fatmel-0856-avr-instruction-set-manual.pdf?v=1563348545070">AVR Commands</a>  &nbsp  <a href = "final_code.txt">Final Project Code</a> &nbsp <a href = "https://www.youtube.com/watch?v=WJ4Jw-tEcSI&feature=youtu.be"> Demo Video</a>  </p>
+    
+    <footer> 
+        <div class = "leftcol">  <p>&copy; 2019 - Kyle Tolliver | ECEN 340 - Digital System Design</p> </div>
+        <div class = "rightcol"> <p>Final Project</p></div>
+    </footer>
+
+     
+  </body>
+</html>
+
+<!--
+Functionality Demonstration:
+Each project must be demonstrated to the instructor.  A video recording is sufficient to demonstrate the project.  The video should be submitted along with a written report.
+
+Written Report: A report will be written describing the project and the results. This report should contain:
+First and second peer review notes.  Include the names of those present and also document the comments that were made.
+A description of the project.  Include diagrams of the project if it includes external components.
+Verilog code.
+Figures and graphs necessary to describe the project.
+A conclusion statement.  As part of the conclusion statement, the level of functionality should be discussed.
+
+<br> 
+    <video width="500" height="300" controls><source src="" type="video/mp4"></video>
+-->

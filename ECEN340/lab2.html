@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Lab 2</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <!-- import the webpage's javascript file -->
+    <script src="/script.js" defer></script>
+  </head>  
+  <body>
+    <header>
+        <nav>
+            <ul>
+                <h1>ECEN 340 Lab 2</h1> 
+                <h2>Data Flow Multiplier</h2>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="labs.html">Labs</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h3>Procedure</h3>     
+    <p>
+Design a unipolar binary multiplier using Verilog “assign” statements.  These statements will need at least the “&”, “+” and the “{}” operators, but we will not use the “*” operator. 
+
+The inputs to the multiplier will be the 16 DIP switches (8 for the multiplicand and 8 for the multiplier).  The bank of 16 LEDs will serve to display the result.
+
+Multiplying by “1” is the same as performing the “AND” function.  Therefore, the following example illustrates the commands that may be used for each partial product for 8-bit multiplication: p0[7:0] = b[0] x a[7:0] = {8{b[0]}} & a[7:0]  …  p7[14:7] = b[7] x a[7:0] = {8{b[7]}} & a[7:0] where p0 through p7 represent the eight partial products to be summed to obtain the final product.  “a[7:0]” represents the multiplicand, and “b[7:0]” represents the multiplier.  Each of the partial product terms will be preceded by the Verilog “assign” command.  Note that 8{1’b0} = 00000000.  Also note that p1-p7 will need a separate assign statement for the zeros used to accomplish the shift left. 
+
+One adaptation to the example equation above is to append the appropriate number of zeros to the partial product in order to accomplish the required shift: assign p7[14:0] = {({8{a[7]}} & b[7:0]), 7’h00};
+
+The above equation appends 7 zeros to the end of “p7”, and adjusts the size of “p7” from 8 elements to 15.  In this way, the final product will be obtained by simply summing the partial product terms:assign product = p0+p1+p2+p3 … p7;
+
+ 
+    </p>
+    <p>
+    Above and Beyond: 3 function calculator for fun    
+    </p>
+    <!--<p>
+      Here's the Lab Report. <a href="https://docs.google.com/document/d/18whos4ZeHDFS90p4f0H5mdsJ31CQ568VYTSZqlbg1ro/edit?usp=sharing">Lab 2 Report</a>
+    </p>-->
+    <p>
+      Here's the Lab Code. <br> <a href="multiply_8.txt">Lab 2 Multiplier Code</a> <br> <a href="interface_3fun.txt">3 Function Calculator Code</a> 
+    </p>
+    
+     <footer>
+        <div class = "leftcol">  <p>&copy; 2019 - Kyle Tolliver | ECEN 340 - Digital System Design</p></div>
+        <div class = "rightcol"> <p>Lab 2</p></div>
+    </footer> 
+    
+  </body>
+</html>

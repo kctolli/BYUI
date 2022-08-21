@@ -1,0 +1,29 @@
+`timescale 1ns / 1ps
+
+module adder_8( input [7:0] X, Y, output [7:0] S, output Cout);
+    wire [6:0] C; // carry around
+    parameter Cin = 0; // carry in 
+    
+    full_adder add0(Cin,  X[0], Y[0], C[0], S[0]); 
+    full_adder add1(C[0], X[1], Y[1], C[1], S[1]); 
+    full_adder add2(C[1], X[2], Y[2], C[2], S[2]); 
+    full_adder add3(C[2], X[3], Y[3], C[3], S[3]); 
+    full_adder add4(C[3], X[4], Y[4], C[4], S[4]); 
+    full_adder add5(C[4], X[5], Y[5], C[5], S[5]); 
+    full_adder add6(C[5], X[6], Y[6], C[6], S[6]); 
+    full_adder add7(C[6], X[7], Y[7], Cout, S[7]); 
+
+endmodule
+
+module full_adder(input Cin, x, y, output Cout, s); 
+    wire z1, z2, z3;
+    
+    //full adder in structural 
+    xor (s, x, y, Cin);
+    and (z1, x, y);
+    and (z2, x, Cin);
+    and (z3, y, Cin);
+    or  (Cout, z1, z2, z3); 
+    
+endmodule
+

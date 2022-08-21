@@ -1,0 +1,43 @@
+`timescale 1ns / 1ps
+
+module gray_counter_top(input clk, rst, output [2:0] led, inout dclk);
+  clk_gen U1(clk, rst, dclk);
+  Counter U2(dclk, rst, led);
+endmodule
+
+module clk_gen(input clk, rst, output clk_div);
+    reg [26:0] counter; wire clkd, dclk;
+    assign clkd = counter[2]; assign dclk = counter[26];
+    
+    initial begin counter <= 27'b000000000000000000000000000; end
+    
+    always @ (posedge clk, posedge rst)begin
+        if (rst) counter <= 27'b000000000000000000000000000;
+        else     counter <= counter + 1'b1; end
+    
+    assign clk_div = clkd; //For Simulation 
+//    assign clk_div = dclk; //For Implementation
+    
+endmodule
+
+module Counter(input clk, rst, output reg [2:0] gray);
+   reg [2:0] gray_next; 
+   always @(posedge clk, posedge rst) begin
+   if(rst) gray <= 3'b111;
+   else begin 
+    gray[0] <= gray_next[0]; 
+    gray[1] <= gray_next[1]; 
+    gray[2] <= gray_next[2]; 
+    end end
+   
+  always@(gray) begin case (gray)
+        3'b000: gray_next <= 3'b001; //1
+        3'b001: gray_next <= 3'b101; //5
+        3'b010: gray_next <= 3'b110; //6
+        3'b011: gray_next <= 3'b010; //2
+        3'b100: gray_next <= 3'b000; //0
+        3'b101: gray_next <= 3'b111; //7
+        3'b110: gray_next <= 3'b100; //4
+        3'b111: gray_next <= 3'b011; //3
+  endcase end 
+endmodule

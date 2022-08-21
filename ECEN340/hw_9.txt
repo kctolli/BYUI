@@ -1,0 +1,72 @@
+// Homework 9 - Verilog State Machines				  (25pts each, 50 total pts)
+/*
+Refer to the homework 3 state machine problem where the solution to the state machine was designed by hand. 
+When writing the code, please do the following:
+• Use parameters for the state names. For example, parameter [1:0] got1 = 00, got10 = 01, etc.
+• Use a case statement to determine the next state based on the current state.
+• Place the state flip-flops in their own "always" block.
+*/
+
+//Main Module
+module Machine(input clk, rst, d, output out0, out1);
+    Moore U0(clk, rst, d, out0);
+    Mealy U1(clk, rst, d, out1);
+endmodule
+
+// 1. Moore-type State Machine Verilog Code
+module Moore(input clk, rst, D, output out);
+	parameter [1:0] INIT = 0, got101 = 3;
+	reg [1:0] state, next; reg d, n0, n1;
+
+	always @(*) begin
+	  d = !D; n0 = !next[0];
+	  next[0] = D; next[1] = (d && next[0]) || (D && n0 && next[1]);
+	end
+
+	always @(posedge clk) begin
+ 	  if (rst) begin state <= INIT; end // Initial state
+ 	  else begin state <= next; end end // Next state  
+ 	
+ 	assign out = (state == got101);
+
+endmodule
+
+// 2. Mealy-type State Machine Verilog Code
+module Mealy(input clk, rst, D, output reg out);
+    parameter [1:0] INIT = 0, got10 = 2;
+	reg [1:0] state, next; reg d;
+	
+	initial out = 1'b0;
+
+	always @(*) begin d = !D;
+	  if (state != got10) begin 
+        next[0] = D; next[1] = (d && next[0]) || (D && next[0] && next[1]); end // Determine next state
+      else if ((state == got10) && D) begin out = 1'b1; state = INIT; end       // Determine whether 101 is found  
+      else state = state; end  // keep state at state
+	   
+	always @(posedge clk) begin
+ 	  if (rst) begin state <= INIT; end // Initial state
+ 	  else begin state <= next; end end // Next state 
+
+endmodule
+
+
+//TestBench Module
+module Machine_tb;
+    reg clk, rst, d;
+    wire out_moore, out_mealy;
+    
+    Machine m(clk, rst, d, out_moore, out_mealy);
+    
+    initial begin
+    clk = 1'b0; rst = 1'b1; d = 1'b0;
+    #10 rst = 1'b0;
+    #100000 $finish; end
+    
+    always #10 d = !d;
+    
+    always #5 clk = !clk;
+    
+endmodule
+
+

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Lab 3</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <!-- import the webpage's javascript file -->
+    <script src="/script.js" defer></script>
+  </head>  
+  <body>
+    <header>
+        <nav>
+            <ul>
+                <h1>ECEN 340 Lab 3</h1> 
+                <h2>Verilog Simulation & 7 seg Display</h2>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="labs.html">Labs</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h3>Procedure</h3>     
+    <p>
+Write a Verilog module to interface to one digit of the 7-seg display.  You will use four of the switches to control the displayed value. You will use the “if, else if, else” structure to interface to display. From the constraints file, you will be using “an”, “dp”, “seg”, and “sw”.
+    </p>
+    <p>
+Synthesize the design and fix all errors. 
+Run simulation (behavioral).  Observe the value of sw[3:0] (Figure 1).
+Right click on “value” and select “Force Constant” to for sw[3:0] to 0 (Figure 2).
+Above the waveform viewer, you will see two blue run arrows.  To run the simulation for 1us, enter 1us in the box to the right of the blue arrows, select the blue arrow with the “t”, and observe the simulated contents of sseg (Figure 3).
+Change the forced value of “sw” to simulate each of the possibilities for to verify functionality.  After each simulation, you will need to “right click” on the simulation output window to resize the simulation viewing area.
+Generate Bitstream and program device to verify the actual functionality of your design.
+    </p>
+    <p>
+    Write a test bench to simulate all of the possible switch settings.
+    </p>
+    <!--<p>
+      Here's the Lab Report. <a href="https://docs.google.com/document/d/1V6HfJjy4_O3eA0nf0CjqLEiOnz2Bkkj3zREsOz_dV_I/edit?usp=sharing">Lab 3 Report</a>
+    </p>-->
+    
+    <p>
+      Here's the Lab Code. <a href="simulate.txt">Lab 3 Code</a>
+    </p>
+    
+    <p>
+      Here's the Lab Test Bench. <a href="">Lab 3 TB</a>
+    </p>
+    
+     <footer>
+        <div class = "leftcol">  <p>&copy; 2019 - Kyle Tolliver | ECEN 340 - Digital System Design</p></div>
+        <div class = "rightcol"> <p>Lab 3</p></div>
+    </footer> 
+    
+  </body>
+</html>
