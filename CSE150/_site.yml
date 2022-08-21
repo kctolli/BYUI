@@ -1,0 +1,99 @@
+name: "data-intuition"
+navbar:
+  title: "Data Intuition and Insight"
+  left:
+    - text: "Case Studies"
+      icon: fa-tasks    
+      menu:
+        - text: "Introduction"
+          href: ./case1.html 
+        - text: "---------------"           
+        - text: "Lego my data"
+          href: ./case2.html  
+        - text: "---------------"   
+        - text: "What is normal about marathons?"
+          href: ./case3.html
+        - text: "---------------"   
+        - text: "What is a healthy child?"
+          href: ./case4.html 
+        - text: "---------------"   
+        - text: "Does your birthday make you better at sports?"
+          href: ./case5.html
+        - text: "---------------"   
+        - text: "Catch me, if you can?"
+          href: ./case6.html 
+        - text: "---------------"   
+        - text: "Can you help me with my data problem?"
+          href: ./case7.html 
+        - text: "---------------"   
+        - text: "Do you want to be a data scientist?"
+          href: ./case8.html      
+    - text: "Materials"
+      icon: fa-book    
+      menu:
+        - text: "Books"  
+        - text: "Good Charts - Amazon"
+          href: https://www.amazon.com/gp/product/1633690709/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1
+        - text: "Supplemental Readings"
+          href: https://byuistats.github.io/BYUI_CSE150_StatBook/
+        - text: "---------------" 
+        - text: "Additional Materials"  
+        - text: "Data Visualisation Catalogue"
+          href: https://datavizcatalogue.com/
+        - text: "Communicating with Tableau"
+          href: https://dataremixed.com/books/cdwt/
+        - text: "Class Notes"
+          href: https://byuistats.github.io/CSE150/class.html    
+    - text: "Data"
+      icon: fa-table
+      menu:
+        - text: "Data-4"
+        - text: "Description"
+          href: ./data.html
+        - text: "Download"
+          href: ./data4/data4.zip     
+        - text: "Google Drive"
+          href: https://drive.google.com/drive/u/0/folders/1jR07hsu3mbsBOmghKset0geclsFn_ZMG 
+        - text: "Github"
+          href: https://github.com/byuidatascience/data4 
+        - text: "---------------" 
+        - text: "Statistics"
+        - text: "Google Sheets"
+          href: https://docs.google.com/spreadsheets/d/1KUq-7qEHB642UB9olN7Fw0Yp9pYoKyCQIhs1TCPP198/template/preview  
+        - text: "Excel"
+          href: ./data4/Stats.xlsx   
+    - text: "Resources"
+      icon: fa-briefcase
+      menu:
+        - text: "Course Website"
+          href: https://byuistats.github.io/CSE150/
+        - text: "---------------"  
+        - text: "Ed Connect"
+          href: https://app.edconnect.app/group/b67cc810-738f-11ea-832d-a5091fd52a48:Communities
+        - text: "---------------" 
+        - text: "What is Data Science?"
+          href: ./ds.html
+        - text: "---------------" 
+        - text: "Grading"
+          href: ./grading.html  
+        - text: "---------------" 
+        - text: "Quotes"
+          href: ./quotes.html  
+        - text: "---------------"      
+        - text: "Tableau"
+          href: https://public.tableau.com/en-us/s/   
+
+          
+output_dir: '.'
+
+output: 
+  html_document:
+    css: ./site_libs/styles.css
+    highlight: tango
+    theme: readable
+    toc: true
+    toc_float: true
+    fig_height: 6
+    fig_width: 12
+    fig_align: 'center'  
+    code_folding: hide 

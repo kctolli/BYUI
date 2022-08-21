@@ -1,0 +1,69 @@
+---
+title: "What is a healthy child?"
+subtitle: "Case Study 4"
+author: "Kyle Tolliver"
+---
+
+```{r load_libraries, include=FALSE}
+library(tidyverse)
+```
+
+## Background
+
+Do you remember you or your sibling going to the doctor for a check-up to hear a conversation about what percentile the measured height and weight were in? The World Health Organization gets some bad press at times of pandemics, but they do much more than managing pandemics. With the US CDC, they define the standards for those percentiles that you hear - https://www.cdc.gov/growthcharts/who_charts.htm.
+
+### Challenge
+
+We have repeated measurements of weights and heights for children from multiple countries. We will use these measures to explain the health of the children in each country and to explore children that have poor health over most of their measurements.
+
+## Deliverables
+
+* A [short presentation (4-8 slides)](./analysis/cs4.pptx) that visualizes child health using the height measurements.
+  + One slide should show the distribution of heights for the US and Dutch data at ~365 days.
+  + One slide should show a plot of the heights of the dutch children over time.
+  + One slide should explain what a z-score is and how it is calculated for our graphics.
+  + One slide should have visualizations of the health of the children at ~365 days for each country (height adjusted z-scores).
+  + One slide should show height adjusted z-scores (HAZ) for a healthy and unhealthy child over all their measurements (don’t use the US data).
+  + Be creative with the remaining slides.
+  
+--- Visualizations created using [Tableau](./tableau/CS4.twb)  
+
+## Class Meeting
+
+### Objective 
+
+Students will understand how percentiles are calculated and data distribution assumptions (Normal distribution).  They will explore how to compare subjects from different normal distributions to explain performance using z-scores. Finally, they will understand the concepts of a confidence interval and how one is calculated using z-scores and normality assumptions.
+
+### Topics Covered
+
+* How to calculate Z-scores for comparison across varied groups.
+* How to calculate percentiles from data and from normal distribution assumptions.
+* How to use and interpret a confidence interval.
+
+## Readings
+
+### Day 11 (No Class)
+
+* Read Good Charts
+  + Chapter 7: Persuasion or Manipulation
+
+### Day 12
+
+* Read [Build a Line Chart](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_line.htm) 
+* Read [Build a Box Plot](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_boxplot.htm) 
+* Read [Tableau Editing your graphic Part 2](https://help.tableau.com/current/pro/desktop/en-us/ask_data.htm) 
+  + [Sorting visualization information](https://help.tableau.com/current/pro/desktop/en-us/sortgroup_sorting_computed_howto.htm) and [a 6-minute video on sorting](https://www.tableau.com/learn/tutorials/on-demand/sorting)
+  + [Filters](https://www.tableau.com/learn/tutorials/on-demand/ways-filter)
+  + [Editing tooltips](https://www.tableau.com/learn/tutorials/on-demand/tooltips)
+  + [Add annotations](https://help.tableau.com/current/pro/desktop/en-us/annotations_annotations_add.htm)
+  + [Grouping categories](https://www.tableau.com/learn/tutorials/on-demand/grouping)
+
+### Day 13
+
+* Read Good Charts 
+  + Chapter 8: Present to Persuade (pg. 177-192)
+
+### Day 14
+
+* CSE 150 Data Intuition and Insight 
+  + Chapter 3: Probability, Sampling, and Confidence Intervals 

@@ -1,0 +1,83 @@
+---
+title: "Lego my data"
+subtitle: "Case Study 2"
+---
+
+```{r load_libraries, include=FALSE}
+library(tidyverse)
+```
+
+## Background
+
+Lego has become one of the most valuable toys on the planet. You can even [download software](https://www.leocad.org/index.html) and create your own sets from bulk toys.
+
+We will be selling bulk LEGO in 1/2-lb bags. According to this LEGO selling guide, the more organized the bricks are the better they will sell. While most Ebayers take a couple of photos and list the number of pounds to sell their project, we will be selling our bags of LEGO with data visualizations.
+
+### Challenge
+
+You will need to work with your team to enter your LEGO data and then create a set of visualizations that sell your product. We will need to prepare our sales material to make sure we can communicate our bag of LEGO without them handling or seeing the product (no pictures of your bag of LEGO).
+
+This is your [bag of legos](https://byuidatascience.github.io/cse150_lego/index.html)
+
+Each buyer will have questions similar to the list below about your blocks. However, other questions may come up during the buying session.
+
+* How many slanted bricks do you have?
+* What is the distribution of colors available in your set?
+* What makes your bag of LEGO unique?
+* What is the total area by color?
+* What are your biggest pieces?
+
+If you would like more details about each brick you can [read here](https://www.bricklink.com/catalog.asp?utm_content=subnav).
+
+## Deliverables
+
+* [3-5 Plot Presentation of your team’s LEGO](./analysis/cs2.pptx)
+  + Estimated value or asking price for your bag
+  + One extra visualization that is requested the day of the sale
+
+* [A complete data set of each LEGO block in your bag](./analysis/cs2.xlsx)
+
+--- Visualizations created using [Tableau](./tableau/CS2.twb)
+
+## Class Meeting
+
+### Objective  
+
+Students discover team collaboration, understand collecting data vs. data summaries and reporting results using visualization with 4 hours of class time and 6-8 hours of beyond class time.
+
+### Topics Covered
+
+* How data are recorded and stored
+* The difference between summary variables, measured variables, and derived variables
+* The key summary variables of mean, median, quartiles, and standard deviation
+* Basic data visualization reporting
+
+## Readings
+
+### Day 3
+
+* Read Good Charts 
+  + Chapter 3: Two questions to four types
+* Read CSE 150: Data Intuition and Insight
+  + Section 1.3.1: Measures of Center
+  + Section 6.2: Tableau Registration and Getting Started
+  
+### Day 4
+
+* Read Good Charts
+  + Chapter 4: Better Charts in a couple of hours (pg. 73-86)
+* Read CSE 150: Data Intuition and Insight
+  + Section 1.3.2: Measures of Spread
+  
+### Day 5  
+
+* Read Good Charts 
+  + Chapter 4: Better Charts in a couple of hours (pg. 87-108)
+* Read CSE 150: Data Intuition and Insight
+  + Section 1.4: Graphical Summaries
+  
+### Day 6  
+
+* Read CSE 150: Data Intuition and Insight
+  + Section 1.5: Data vs. Summaries 
+  + Section 6.2.3 Tableau Introduction depth 
