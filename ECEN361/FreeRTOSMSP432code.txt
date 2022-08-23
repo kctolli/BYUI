@@ -1,0 +1,175 @@
+/* Standard includes. */
+#include <stdio.h>
+
+/* Kernel includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+
+
+/* TI includes. */
+#include "gpio.h"
+
+static void vTaskFunction1( void *pvParameters );
+static void vTaskFunction2( void *pvParameters );
+
+
+static void prvSetupHardware( void );
+
+
+int main( void )
+{
+	/* See http://www.FreeRTOS.org/TI_MSP432_Free_RTOS_Demo.html for instructions. */
+
+  	/* Prepare the hardware to run this demo. */
+	prvSetupHardware();
+	printf("Running task1 function\n");
+
+    xTaskCreate( vTaskFunction1, "Task 1", 200, NULL, 1, NULL );
+    xTaskCreate( vTaskFunction2, "Task 2", 200, NULL, 2, NULL );
+    /* Start the scheduler. */
+    vTaskStartScheduler();
+
+    /* If all is well, the scheduler will now be running, and the following
+    line will never be reached.  If the following line does execute, then
+    there was insufficient FreeRTOS heap memory available for the Idle and/or
+    timer tasks to be created.  See the memory management section on the
+    FreeRTOS web site for more details on the FreeRTOS heap
+    http://www.freertos.org/a00111.html. */
+    for( ;; );
+
+	return 0;
+}
+/*-----------------------------------------------------------*/
+
+void vTaskFunction1( void *pvParameters )
+{
+
+  /* As per most tasks, this task is implemented in an infinite loop. */
+  for( ;; )
+  {
+
+        GPIO_toggleOutputOnPin(
+                       GPIO_PORT_P4,
+                       GPIO_PIN0
+                       );
+
+    /* Delay for a period.  This time we use a call to vTaskDelay() which
+    puts the task into the Blocked state until the delay period has expired.
+    The delay period is specified in 'ticks'. */
+    vTaskDelay( 500 / portTICK_PERIOD_MS );
+  }
+}
+
+void vTaskFunction2( void *pvParameters )
+{
+
+
+  /* As per most tasks, this task is implemented in an infinite loop. */
+  for( ;; )
+  {
+
+        GPIO_toggleOutputOnPin(
+                       GPIO_PORT_P4,
+                       GPIO_PIN1
+                       );
+
+    /* Delay for a period.  This time we use a call to vTaskDelay() which
+    puts the task into the Blocked state until the delay period has expired.
+    The delay period is specified in 'ticks'. */
+    vTaskDelay( 250 / portTICK_PERIOD_MS );
+  }
+}
+
+
+static void prvSetupHardware( void )
+{
+    extern void FPU_enableModule( void );
+
+
+	/* Stop the watchdog timer. */
+	MAP_WDT_A_holdTimer();
+
+	/* Ensure the FPU is enabled. */
+	FPU_enableModule();
+
+    /* Set Flash wait state for high clock frequency.  Refer to datasheet for
+    more details. */
+    FlashCtl_setWaitState( FLASH_BANK0, 2 );
+    FlashCtl_setWaitState( FLASH_BANK1, 2 );
+
+    /* The full demo configures the clocks for maximum frequency, wheras the
+    blinky demo uses a slower clock as it also uses low power features.  Maximum
+    freqency also needs more voltage.
+
+    From the datashee:  For AM_LDO_VCORE1 and AM_DCDC_VCORE1 modes, the maximum
+    CPU operating frequency is 48 MHz and maximum input clock frequency for
+    peripherals is 24 MHz. */
+    PCM_setCoreVoltageLevel( PCM_VCORE1 );
+    CS_setDCOCenteredFrequency( CS_DCO_FREQUENCY_48 );
+    CS_initClockSignal( CS_HSMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1 );
+    CS_initClockSignal( CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1 );
+    CS_initClockSignal( CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1 );
+    CS_initClockSignal( CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1 );
+
+	/* Selecting P1.2 and P1.3 in UART mode and P1.0 as output (LED) */
+	MAP_GPIO_setAsPeripheralModuleFunctionInputPin( GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION );
+	MAP_GPIO_setOutputLowOnPin( GPIO_PORT_P1, GPIO_PIN0 );
+	MAP_GPIO_setAsOutputPin( GPIO_PORT_P4, GPIO_PIN0 );
+	MAP_GPIO_setAsOutputPin( GPIO_PORT_P4, GPIO_PIN1 );
+}
+/*-----------------------------------------------------------*/
+
+void vApplicationMallocFailedHook( void )
+{
+	/* vApplicationMallocFailedHook() will only be called if
+	configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
+	function that will get called if a call to pvPortMalloc() fails.
+	pvPortMalloc() is called internally by the kernel whenever a task, queue,
+	timer or semaphore is created.  It is also called by various parts of the
+	demo application.  If heap_1.c or heap_2.c are used, then the size of the
+	heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+	FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+	to query the size of free heap space that remains (although it does not
+	provide information on how the remaining heap might be fragmented). */
+	taskDISABLE_INTERRUPTS();
+	for( ;; );
+}
+/*-----------------------------------------------------------*/
+
+void vApplicationIdleHook( void )
+{
+	/* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
+	to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
+	task.  It is essential that code added to this hook function never attempts
+	to block in any way (for example, call xQueueReceive() with a block time
+	specified, or call vTaskDelay()).  If the application makes use of the
+	vTaskDelete() API function (as this demo application does) then it is also
+	important that vApplicationIdleHook() is permitted to return to its calling
+	function, because it is the responsibility of the idle task to clean up
+	memory allocated by the kernel to any task that has since been deleted. */
+}
+/*-----------------------------------------------------------*/
+
+void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+{
+	( void ) pcTaskName;
+	( void ) pxTask;
+
+	/* Run time stack overflow checking is performed if
+	configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+	function is called if a stack overflow is detected. */
+	taskDISABLE_INTERRUPTS();
+	for( ;; );
+}
+/*-----------------------------------------------------------*/
+
+void *malloc( size_t xSize )
+{
+	/* There should not be a heap defined, so trap any attempts to call
+	malloc. */
+	Interrupt_disableMaster();
+	for( ;; );
+}
+/*-----------------------------------------------------------*/
+
+
